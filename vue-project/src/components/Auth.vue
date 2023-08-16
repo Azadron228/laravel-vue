@@ -1,5 +1,4 @@
 <template>
-  
   <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
       <h2 class="text-2xl font-bold mb-4">Login</h2>
@@ -41,9 +40,9 @@ export default {
       };
 
       // Fetch CSRF cookie
-      await axios.get("/sanctum/csrf-cookie");
-
-      axios
+      await axios.get("/sanctum/csrf-cookie").then(response => {
+      // Login...
+        axios
         .post("/login", formData)
         .then((response) => {
           this.$router.push('/');
@@ -51,6 +50,9 @@ export default {
         .catch((error) => {
           this.errorMessage = "Incorrect credentials. Please try again.";
         });
+      });
+
+      
     },
   },
 };

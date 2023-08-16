@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import Navbar from '../components/NavBar.vue'
-  import Profile from '../components/Profile.vue'
+  import CreatePost from '../components/CreatePost.vue'
 </script>
 
 <template>
     <Navbar />
-    <Profile />
+    <CreatePost />
 </template>
