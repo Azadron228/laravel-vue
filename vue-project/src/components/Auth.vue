@@ -53,6 +53,21 @@ export default {
       });
 
       
+
+      await axios.get("/sanctum/csrf-cookie").then(async () => {
+      try {
+        // Login...
+        await axios.post("/login", formData);
+        
+        // Fetch user info and update the store
+        await useUserStore().fetchUserInfo();
+        
+        this.$router.push('/');
+      } catch (error) {
+        this.errorMessage = "Incorrect credentials. Please try again.";
+      }
+    });
+
     },
   },
 };

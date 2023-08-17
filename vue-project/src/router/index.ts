@@ -5,9 +5,27 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/test',
+      name: 'test',
+      component: () => import('../views/TestPage.vue')
+
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: '404',
+      component: () => import('../components/NotFound.vue')
+
+    },
+    {
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/post/:id',
+      name: 'post',
+      component: () => import('../views/Post.vue')
+
     },
     {
       path: '/login',
@@ -18,7 +36,7 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
-      path: '/create-post',
+      path: '/post/create',
       name: 'createPost',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
@@ -32,14 +50,6 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/ProfileView.vue')
-    },
-    {
-      path: '/update-user',
-      name: 'updateUser',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/UpdateUser.vue')
     },
     {
       path: '/register',

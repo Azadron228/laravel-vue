@@ -13,6 +13,7 @@
     </div>
     
     <div class="mb-4">
+      <input type="file" ref="avatarInput" @change="handleAvatarUpload" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
       <label class="block mb-2 font-semibold" for="avatar">Avatar (link):</label>
       <input v-model="avatar" id="avatar" type="text" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
     </div>
@@ -23,6 +24,8 @@
     </div>
     
     <button @click="updateProfile" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Update Profile</button>
+
+    <button @click="logOut" class="px-4 py-2 bg-red-500 text-white rounded-lg">Log Out</button>
   </div>
 </template>
 
@@ -55,6 +58,16 @@ export default {
           name: this.name,
           email: this.email
         }); // Replace with your API endpoint
+        
+        console.log('Profile updated:', response.data);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    },
+    async logOut() {
+      try {
+        const response = await axios.post('/logout'); // Replace with your API endpoint
+        this.$router.push('/');
         
         console.log('Profile updated:', response.data);
       } catch (error) {
