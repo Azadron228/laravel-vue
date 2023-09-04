@@ -1,76 +1,48 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
-      <h2 class="text-2xl font-bold mb-4">Login</h2>
+    <div class="max-w-md w-full p-6 bg-white shadow-md rounded-lg">
+      <h1 class="text-2xl font-semibold mb-4">Login</h1>
       <form @submit.prevent="login">
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
-          <input v-model="email" type="email" id="email" class="mt-1 p-2 w-full border rounded" />
+          <label class="block text-gray-600 text-sm mb-1" for="email">Email</label>
+          <input v-model="formStore.email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-400" type="text" id="email" placeholder="Email">
         </div>
-        <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-700">Password:</label>
-          <input v-model="password" type="password" id="password" class="mt-1 p-2 w-full border rounded" />
+        <div class="mb-6">
+          <label class="block text-gray-600 text-sm mb-1" for="password">Password</label>
+          <input v-model="formStore.password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-400" type="password" id="password" placeholder="Password">
         </div>
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full">
-          Login
-        </button>
-        <p class="text-red-500 mt-2" v-if="errorMessage">{{ errorMessage }}</p>
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">Login</button>
       </form>
+      <div class="mt-4 text-center">
+        <p class="text-gray-600">Don't have an account? <router-link to="/register" class="text-blue-500 hover:underline">Register</router-link></p>
+      </div>
+      <div v-if="userStore.isLogged">
+    <p>Welcome, {{ userStore.userInfo.email }}</p>
+  </div>
     </div>
   </div>
 </template>
 
-<script>
-import axios from "../api.js";
+<script setup>
+import { ref } from 'vue';
+import api from '../api/index.ts'
+import { useUserStore } from '../stores/userStore.ts'; // Adjust the path as needed
+import { useRouter } from 'vue-router';
 
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-      errorMessage: "",
-    };
-  },
-  methods: {
-    async login() {
+const router = useRouter();
+const userStore = useUserStore();
 
-      const formData = {
-        email: this.email,
-        password: this.password,
-      };
+const formStore = ref({ email: '', password: '' })
 
-      // Fetch CSRF cookie
-      await axios.get("/sanctum/csrf-cookie").then(response => {
-      // Login...
-        axios
-        .post("/login", formData)
-        .then((response) => {
-          this.$router.push('/');
-        })
-        .catch((error) => {
-          this.errorMessage = "Incorrect credentials. Please try again.";
-        });
-      });
-
-      
-
-      await axios.get("/sanctum/csrf-cookie").then(async () => {
-      try {
-        // Login...
-        await axios.post("/login", formData);
-        
-        // Fetch user info and update the store
-        await useUserStore().fetchUserInfo();
-        
-        this.$router.push('/');
-      } catch (error) {
-        this.errorMessage = "Incorrect credentials. Please try again.";
-      }
-    });
-
-    },
-  },
+const login = async () => {
+  try {
+    const response = await api.login({ user: formStore.value }); 
+    console.log(response.data.user);
+    userStore.updateUserInfo(response.data.user);
+    router.push('/');
+  } catch (error) {
+    // Handle login error here
+  }
 };
 </script>
-
 

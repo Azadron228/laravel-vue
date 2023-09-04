@@ -3,47 +3,45 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Http\Response;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::post('/api/register', [AuthController::class, 'register']);
+Route::post('/api/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 
-Route::get('/', function () { return 'Hello World';});
+// Guest accessible routes
+Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
+Route::get('post/{id}', [PostController::class, 'show'])->name('posts.show');
 
-// Authentication logic
-Route::get('/register', [RegistrationController::class, 'create'])->name('register');
-Route::post('/register', [RegistrationController::class, 'store']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-
-Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+Route::get('profiles/{username}', [ProfileController::class, 'show'])->name('get');
+// Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('api/user', [UserController::class, 'show'])->name('current');
+    Route::put('api/user', [UserController::class, 'update'])->name('update');
+
+    Route::post('profiles/{username}/follow', [ProfileController::class, 'follow'])
+        ->name('follow');
+    Route::delete('profiles/{username}/follow', [ProfileController::class, 'unfollow'])
+        ->name('unfollow');
+
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
-    Route::put('/profile', [UserController::class, 'updateUser'])->name('profile.update');
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
-    Route::get('post/{id}', [PostController::class, 'show'])->name('posts.show');
-    Route::delete('post/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
-    Route::post('post/create', [PostController::class, 'createPost'])->name('post.create');
-    Route::get('/post/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::post('/user/{user}/follow', [UserController::class, 'follow'])->name('users.follow');
+    Route::post('/user/{user}/unfollow', [UserController::class, 'unfollow'])->name('users.unfollow');
+
+    Route::post('comments', [CommentController::class, 'create']);
+    Route::delete('comments/{comment}', [CommentController::class, 'delete']);
+    Route::get('posts/{post_id}/comments', [CommentController::class, 'getAll']);
+
+    Route::post('/post/create', [PostController::class, 'createPost'])->name('post.create');
     Route::put('/post/{id}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('post/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::get('/posts/feed', [PostController::class, 'getFeed'])->name('post.feed');
+    Route::post('/posts/{post}/favorite', [PostController::class, 'favoritePost'])->name('posts.favorite');
+    Route::delete('/posts/{post}/unfavorite', [PostController::class, 'unfavoritePost'])->name('posts.unfavorite');
 });
-
-
-    Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');

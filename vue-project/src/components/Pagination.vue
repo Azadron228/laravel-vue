@@ -1,73 +1,117 @@
 <template>
-  <nav class="flex items-center justify-center mt-4">
-    <ul class="flex space-x-2">
-      <li>
-        <button
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="px-2 py-1 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none"
-        >
-          Previous
-        </button>
-      </li>
-      <li>
-        <button
-          v-for="pageNumber in displayedPages"
-          :key="pageNumber"
-          @click="goToPage(pageNumber)"
-          :class="{
-            'px-3 py-1 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none': true,
-            'bg-gray-200': pageNumber === currentPage
-          }"
-        >
-          {{ pageNumber }}
-        </button>
-      </li>
-      <li>
-        <button
-          @click="goToPage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-          class="px-2 py-1 rounded-md text-gray-700 hover:bg-gray-200 focus:outline-none"
-        >
-          Next
-        </button>
-      </li>
-    </ul>
-  </nav>
+  <div aria-label="Pagination" class="flex items-center justify-between py-4">
+    <p class="text-sm text-gray-500">
+      Page {{ meta.current_page }} of {{ meta.last_page }}
+    </p>
+    <div class="flex">
+      <button
+        rel="first"
+        type="button"
+        @click="firstPage"
+        v-if="links.prev"
+        class="px-4 py-2 m-1 text-sm text-pink-400 border rounded hover:text-pink-500"
+      >
+        First
+      </button>
+
+      <button
+        rel="prev"
+        type="button"
+        @click="prevPage"
+        :class="{ 'rounded-r': !links.next }"
+        v-if="links.prev"
+        class="px-4 py-2 m-1 text-sm text-pink-400 border rounded hover:text-pink-500"
+      >
+        Previous
+      </button>
+
+      <button
+        rel="next"
+        type="button"
+        @click="nextPage"
+        :class="{ 'rounded-l': !links.prev }"
+        v-if="links.next"
+        class="px-4 py-2 m-1 text-sm text-pink-400 border rounded hover:text-pink-500"
+      >
+        Next
+      </button>
+
+      <button
+        rel="last"
+        type="button"
+        @click="lastPage"
+        v-if="links.next"
+        class="px-4 py-2 m-1 text-sm text-pink-400 border rounded hover:text-pink-500"
+      >
+        Last
+      </button>
+    </div>
+  </div>
 </template>
 
-<script>
-export default {
-  props: {
-    currentPage: Number,
-    totalPages: Number,
-    onPageChange: Function,
-    maxDisplayedPages: {
-      type: Number,
-      default: 7
-    }
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const props = defineProps({
+  action: {
+    type: String,
+    required: true,
   },
-  computed: {
-    displayedPages() {
-      const startPage = Math.max(1, this.currentPage - Math.floor(this.maxDisplayedPages / 2));
-      const endPage = Math.min(this.totalPages, startPage + this.maxDisplayedPages - 1);
-
-      const pages = [];
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      return pages;
-    }
+  path: {
+    type: String,
+    default: null,
   },
-  methods: {
-    goToPage(pageNumber) {
-      if (pageNumber >= 1 && pageNumber <= this.totalPages) {
-        this.onPageChange(pageNumber);
+  meta: {
+    type: Object,
+    required: true,
+  },
+  links: {
+    type: Object,
+    required: true,
+  },
+});
 
-        this.$router.push({ query: { page: pageNumber } });
-      }
+const firstPage = () => {
+  store.dispatch(props.action, props.links.first).then(() => {
+    if (props.path) {
+      router.push({
+        path: props.path,
+        query: { page: 1 },
+      });
     }
-  }
+  });
+};
+
+const prevPage = () => {
+  store.dispatch(props.action, props.links.prev).then(() => {
+    if (props.path) {
+      router.push({
+        path: props.path,
+        query: { page: props.meta.current_page - 1 },
+      });
+    }
+  });
+};
+
+const nextPage = () => {
+  store.dispatch(props.action, props.links.next).then(() => {
+    if (props.path) {
+      router.push({
+        path: props.path,
+        query: { page: props.meta.current_page + 1 },
+      });
+    }
+  });
+};
+
+const lastPage = () => {
+  store.dispatch(props.action, props.links.last).then(() => {
+    if (props.path) {
+      router.push({
+        path: props.path,
+        query: { page: props.meta.last_page },
+      });
+    }
+  });
 };
 </script>

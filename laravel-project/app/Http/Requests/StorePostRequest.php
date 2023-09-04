@@ -2,16 +2,17 @@
 
 namespace App\Http\Requests;
 
+use Arr;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePostsRequest extends FormRequest
+class StorePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,11 @@ class StorePostsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'thumbnail' => 'sometimes|image|mimes:jpeg,jpg,gif,png|max:20480',
+            'tagList' => 'sometimes|array',
+            'tagList.*' => 'required|string|max:255',
         ];
     }
 }

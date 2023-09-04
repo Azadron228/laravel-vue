@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import Navbar from '../components/NavBar.vue'
+  import Navbar from '../components/TheHeader.vue'
   import ListPosts from '../components/ListPosts.vue'
 </script>
 

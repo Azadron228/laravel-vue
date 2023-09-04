@@ -8,6 +8,9 @@ dependencies:
   axios:
     specifier: ^1.4.0
     version: 1.4.0
+  laravel-vue-pagination:
+    specifier: ^4.1.1
+    version: 4.1.1
   pinia:
     specifier: ^2.1.4
     version: 2.1.4(typescript@5.1.6)(vue@3.3.4)
@@ -3226,6 +3229,12 @@ packages:
       json-schema: 0.4.0
       verror: 1.10.0
     dev: true
+
+  /laravel-vue-pagination@4.1.1:
+    resolution: {integrity: sha512-boxhYDVDWIthlAelZA7CAr9EV3H6QQKgR3SDkkLVCEhc+GNWHGLoo6tZlffwdUbnOzNTL3fcqYAxtfEV0gPxww==}
+    dependencies:
+      vue: 3.3.4
+    dev: false
 
   /lazy-ass@1.6.0:
     resolution: {integrity: sha512-cc8oEVoctTvsFZ/Oje/kGnHbpWHYBe8IAJe4C0QNc3t8uM/0Y8+erSz/7Y1ALuXTEZTMvxXwO6YbX1ey3ujiZw==}

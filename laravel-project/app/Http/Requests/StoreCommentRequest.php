@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
-class UpdatePostsRequest extends FormRequest
+class StoreCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +23,7 @@ class UpdatePostsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'body' => 'required|string',
         ];
     }
 }

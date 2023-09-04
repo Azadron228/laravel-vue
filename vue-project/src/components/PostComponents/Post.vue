@@ -1,32 +1,25 @@
 <template>
   <div class="max-w-md mx-auto mt-4 p-4">
     <h2 class="text-xl font-semibold mb-2">{{ post.title }}</h2>
-    <p class="text-gray-600">{{ post.content }}</p>
+    <p class="text-gray-600">{{ post.body}}</p>
   </div>
 </template>
 
-<script>
-import axios from '@/api.js';
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue'
+import api from '@/api/index.js'
+import { useRoute } from 'vue-router';
 
-export default {
-  data() {
-    return {
-      post: {},
-    };
-  },
-  created() {
-    const postId = this.$route.params.id; // Fetch the ID parameter from the route
-    axios.get(`/post/${postId}`) // Replace with your API endpoint
-      .then(response => {
-        this.post = response.data;
-      })
-      .catch(error => {
-        console.error('Error fetching post:', error);
-      });
-  },
-};
+const post = ref([])
+const route = useRoute(); 
+const postId = route.params.id;
+console.log(postId);
+async function getPost(postId) {
+  const fetchedPosts = await api.getPost(postId);
+  post.value = fetchedPosts.data.post
+  console.log(fetchedPosts)
+}
+onMounted(() => {
+getPost(postId);
+})
 </script>
-
-<style scoped>
-/* Tailwind CSS classes can be applied here */
-</style>

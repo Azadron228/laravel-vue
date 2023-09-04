@@ -2,36 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle an authentication attempt.
-     */
-    public function login(Request $request) 
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
- 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
- 
-            return $request;
+        if (Auth::attempt($request->validated())) {
+            return new UserResource(Auth::user());
         }
- 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+
+        // return back()->withErrors([
+        //     'email' => 'The provided credentials do not match our records.',
+        // ])->onlyInput('email');
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
+    public function register(StoreUserRequest $request)
+    {
+        $attributes = $request->validated();
+
+        $attributes['password'] = Hash::make($attributes['password']);
+
+        $user = User::create($attributes);
+        Auth::login($user);
+
+        return (new UserResource($user))
+            ->response()
+            ->setStatusCode(201);
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

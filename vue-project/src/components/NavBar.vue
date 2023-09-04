@@ -3,39 +3,37 @@
 
 
 
+
+
 <template>
-  <nav class="bg-gray-800 p-4">
-    <div class="container flex justify-between items-center w-full">
-      <div class="text-white font-semibold text-xl">My App</div>
-      <div class="flex space-x-4">
-        <a class="text-white hover:text-gray-300" href="#">Home</a>
-        <a class="text-white hover:text-gray-300" href="/update-user">UpdateUser</a>
-        <template v-if="userStore.user.isLoggedIn">
-          <span class="text-white">{{ userStore.user.name }}</span>
-        </template>
-        <template v-else>
-          <a class="text-white hover:text-gray-300" href="/login">Log in</a>
-          <a class="text-white hover:text-gray-300" href="/register">Register</a>
-        </template>
+  <nav>
+    <div class="bg-gray-800 p-4">
+      <span class="text-white text-lg font-semibold">My App</span>
+      <div class="flex items-center space-x-4">
+        <span v-if="userStore.userInfo" class="text-white">Hello, {{ userStore.userInfo.name }}</span>
+        <a v-else href="/login" class="text-blue-500 hover:underline">Login</a>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore.js';
+import { useUserStore } from '../stores/userStore.ts'; // Adjust the path to your store
+import { onMounted } from 'vue';
 
 export default {
   name: 'Navbar',
-  computed: {
-    userStore() {
-      return useUserStore();
-    },
+  setup() {
+    const userStore = useUserStore();
+
+    userStore.getUserInfo();
+
+    return { userStore };
   },
 };
 </script>
 
-<style scoped>
-/* You can add custom styles here if needed */
+<style>
+/* Your CSS styling for the navbar */
 </style>
 

@@ -1,82 +1,42 @@
-<template>
-  <div class="max-w-md mx-auto p-4">
-    <h1 class="text-2xl font-semibold mb-4">User Profile</h1>
-    
-    <div class="mb-4">
-      <label class="block mb-2 font-semibold" for="name">Name:</label>
-      <input v-model="name" id="name" type="text" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
-    </div>
-    
-    <div class="mb-4">
-      <label class="block mb-2 font-semibold" for="email">Email:</label>
-      <input v-model="email" id="email" type="email" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
-    </div>
-    
-    <div class="mb-4">
-      <input type="file" ref="avatarInput" @change="handleAvatarUpload" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
-      <label class="block mb-2 font-semibold" for="avatar">Avatar (link):</label>
-      <input v-model="avatar" id="avatar" type="text" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
-    </div>
-    
-    <div class="mb-4">
-      <label class="block mb-2 font-semibold" for="password">Password:</label>
-      <input v-model="password" id="password" type="password" class="w-full rounded-lg px-3 py-2 border focus:outline-none focus:border-blue-500" />
-    </div>
-    
-    <button @click="updateProfile" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Update Profile</button>
 
-    <button @click="logOut" class="px-4 py-2 bg-red-500 text-white rounded-lg">Log Out</button>
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+      <h2 class="text-3xl font-semibold mb-4 text-center">Profile Page</h2>
+      <div v-if="isLoggedIn" class="text-center">
+        <div class="flex items-center flex-col mb-4">
+          <img :src="'http://127.0.0.1:8000' + userInfo.avatar" alt="Avatar" class="w-24 h-24 rounded-full mb-2">
+          <h3 class="text-xl font-semibold">{{ userInfo.username }}</h3>
+          <p class="text-gray-600 text-sm">{{ userInfo.email }}</p>
+        </div>
+        <p class="text-center text-gray-700">{{ userInfo.bio }}</p>
+        <button @click="logout"
+          class="bg-red-500 text-white px-4 py-2 rounded mt-4 hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
+          Logout
+        </button>
+      </div>
+      <div v-else>
+        <p class="text-center text-gray-700">You are not logged in.</p>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
-import axios from '../api.js';
 
-export default {
-  data() {
-    return {
-      name: '',
-      email: '',
-      avatar: '',
-      password: ''
-    };
-  },
-  methods: {
-    async fetchProfile() {
-      try {
-        const response = await axios.get('/profile'); // Replace with your API endpoint
-        this.name = response.data.name;
-        this.email = response.data.email;
-        this.avatar = response.data.avatar;
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    },
-    async updateProfile() {
-      try {
-        const response = await axios.put('/profile', {
-          name: this.name,
-          email: this.email
-        }); // Replace with your API endpoint
-        
-        console.log('Profile updated:', response.data);
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
-    },
-    async logOut() {
-      try {
-        const response = await axios.post('/logout'); // Replace with your API endpoint
-        this.$router.push('/');
-        
-        console.log('Profile updated:', response.data);
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
-    }
-  },
-  mounted() {
-    this.fetchProfile();
-  }
-};
+
+<script setup>
+import { useUserStore } from '../stores/userStore.ts'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
+const userInfo = userStore.userInfo
+const isLoggedIn = userStore.isLoggedIn
+
+const router = useRouter()
+
+const logout = () => {
+  userStore.updateUserInfo(null)
+  router.push('/') // Redirect to the login page after logout
+}
 </script>
