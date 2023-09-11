@@ -36,7 +36,7 @@ const formStore = ref({ email: '', password: '' })
 
 const login = async () => {
   try {
-    const response = await api.login({ user: formStore.value }); 
+    const response = await api.login(formStore.value ); 
     console.log(response.data.user);
     userStore.updateUserInfo(response.data.user);
     router.push('/');

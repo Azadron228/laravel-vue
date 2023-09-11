@@ -20,7 +20,9 @@ class UpdateUserRequest extends FormRequest
         return [
             'username' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255',
+            'bio' => 'sometimes|string',
             'avatar' => 'sometimes|image|max:20480',
+
         ];
     }
 }

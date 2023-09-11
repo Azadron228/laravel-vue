@@ -32,7 +32,6 @@ class PostController extends Controller
                 'tags',
                 fn (Builder $builder) => $builder->where('name', $tagName)
             );
-
         }
 
         if ($request->has('author')) {
@@ -43,10 +42,20 @@ class PostController extends Controller
         }
 
         if ($request->has('favorited')) {
-            $user = auth()->user();
-            $query = $user->favorites();
+            $favoritedName = $request->input('favorited');
+
+            $user = User::where('username', $favoritedName)->first();
+
+            if ($user) {
+                // If the user exists, filter posts that are favorited by the user.
+                $query->whereIn('id', $user->favorites->pluck('id'));
+            } else {
+                // Handle the case where the favorited user doesn't exist.
+                return response()->json(['message' => 'Favorited user not found'], 404);
+            }
         }
         $posts = $query->paginate(10);
+
         return new PostCollection($posts);
     }
 
@@ -83,8 +92,7 @@ class PostController extends Controller
         $post = Post::create($validatedData);
         if (is_array($tags)) {
             $post->attachTags($tags);
-        };
-
+        }
 
         return new PostResource($post);
     }
@@ -103,8 +111,14 @@ class PostController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * Update the given blog post.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function update(UpdatePostRequest $request, Post $post, $id)
     {
+        $this->authorize('update', $post);
         $post = Post::findOrFail($id);
         $validatedData = $request->validated();
 

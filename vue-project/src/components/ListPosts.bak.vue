@@ -1,13 +1,12 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <div v-for="post in posts" :key="post.id">
-      <div class="mb-4 max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-lg">
+    <div v-for="post in posts.data" :key="post.id">
+      <div class="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-lg">
         <img
-          class="h-41 w-full object-cover object-center"
+          class="h-48 w-full object-cover object-center"
           src="https://w.wallhaven.cc/full/4o/wallhaven-4oq6p0.png"
           alt="Post Thumbnail"
         />
-
         <div class="p-6">
           <div class="font-semibold text-2xl mb-2">{{ post.title }}</div>
           <router-link
@@ -50,48 +49,28 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
     <div class="flex justify-center mt-6">
       <TailwindPagination :data="posts" @pagination-change-page="getPosts" />
     </div>
-    <div class="flex justify-center mt-6">
-      <!-- Use the TailwindPagination component with props -->
-      <TailwindPagination :data="paginationData" @pagination-change-page="getPosts" />
-    </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, computed, defineProps } from 'vue'
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue'
 import api from '../api/index.js'
 import { TailwindPagination } from 'laravel-vue-pagination'
 
-// Define props to make the component more reusable
-const props = defineProps({
-  author: String,
-  favorited: String
-})
-
 const posts = ref([])
-const currentPage = ref(1)
 
-const paginationData = computed(() => {
-  return {
-    current_page: currentPage.value,
-    author: props.author,
-    favorited: props.favorited
-  }
-})
-
-async function getPosts(page = 1) {
-  currentPage.value = page
-  const fetchedPosts = await api.getPosts(page, props.author, props.favorited)
-  posts.value = fetchedPosts.data.data
+async function getPosts(page = 1, author = '', favorited = '') {
+  const fetchedPosts = await api.getPosts(page, author, favorited)
+  posts.value = fetchedPosts.data
+  console.log(fetchedPosts.data)
 }
-
 onMounted(() => {
   getPosts()
 })
+
 </script>

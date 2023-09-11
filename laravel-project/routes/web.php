@@ -5,6 +5,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/api/register', [AuthController::class, 'register']);
@@ -14,6 +15,24 @@ Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 // Guest accessible routes
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
 Route::get('post/{id}', [PostController::class, 'show'])->name('posts.show');
+
+
+// Verify email
+Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+// // Resend link to verify email
+// Route::post('/email/verify/resend', function (Request $request) {
+//     $request->user()->sendEmailVerificationNotification();
+//     return back()->with('message', 'Verification link sent!');
+// })->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+//
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('profiles/{username}', [ProfileController::class, 'show'])->name('get');
 // Authenticated routes

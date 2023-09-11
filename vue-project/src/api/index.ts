@@ -1,9 +1,13 @@
 import request from '../utils/requests.ts'
 
-function getPosts(page) {
+function getPosts(page, author, favorited) {
     return request({
       url: '/posts',
-      params: { page },
+      params: { 
+        page,
+        author,
+        favorited,
+      },
   }) 
 };
 function getPost(postId) {

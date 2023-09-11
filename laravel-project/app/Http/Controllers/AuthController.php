@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,8 @@ class AuthController extends Controller
         // return back()->withErrors([
         //     'email' => 'The provided credentials do not match our records.',
         // ])->onlyInput('email');
+
+        return response(['message' => 'Invalid Credentials']);
     }
 
     public function register(StoreUserRequest $request)
@@ -32,6 +35,8 @@ class AuthController extends Controller
 
         $user = User::create($attributes);
         Auth::login($user);
+
+        event(new Registered($user));
 
         return (new UserResource($user))
             ->response()

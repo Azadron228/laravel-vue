@@ -1,12 +1,5 @@
-
-
-
-
-
-
-
 <template>
-  <nav>
+  <nav class="h-10">
     <div class="bg-gray-800 p-4">
       <span class="text-white text-lg font-semibold">My App</span>
       <div class="flex items-center space-x-4">
