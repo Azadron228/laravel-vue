@@ -26,7 +26,7 @@ class StorePostRequest extends FormRequest
             'title' => 'required|string|max:255',
             'body' => 'required|string',
             'thumbnail' => 'sometimes|image|mimes:jpeg,jpg,gif,png|max:20480',
-            'tagList' => 'sometimes|array',
+            'tags' => 'sometimes|array',
             'tagList.*' => 'required|string|max:255',
         ];
     }

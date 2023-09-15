@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+Route::get('/listTags', [PostController::class, 'listTags'])->name('tags');
 
 // Guest accessible routes
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');

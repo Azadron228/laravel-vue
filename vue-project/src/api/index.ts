@@ -15,6 +15,11 @@ function getPost(postId) {
     url: `/post/${postId}`,
   })
 }
+function getTags() {
+  return request({
+    url: `/listTags`,
+  })
+}
 function login(params: { user: User }) {
   return request({
     url: '/api/login',
@@ -55,6 +60,7 @@ function getProfile() {
 };
 export default {
   getPosts,
+  getTags,
   getPost,
   login,
   register,

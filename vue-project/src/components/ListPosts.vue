@@ -1,64 +1,86 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <div v-for="post in posts" :key="post.id">
-      <div class="mb-4 max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-lg">
-        <img
-          class="h-41 w-full object-cover object-center"
-          src="https://w.wallhaven.cc/full/4o/wallhaven-4oq6p0.png"
-          alt="Post Thumbnail"
-        />
+    <div class="grid grid-rows-2">
+      <div class="mb-4 flex space-x-4">
+        <p>This is all Tags</p>
+        <button
+          v-for="tag in allTags"
+          :key="tag"
+          @click="toggleTagFilter(tag)"
+          :class="{
+            'bg-blue-500 text-white': selectedTags.includes(tag),
+            'bg-gray-200 text-gray-700': !selectedTags.includes(tag)
+          }"
+          class="px-3 py-1 rounded-full focus:outline-none"
+        >
+          {{ tag }}
+        </button>
+      </div>
 
-        <div class="p-6">
-          <div class="font-semibold text-2xl mb-2">{{ post.title }}</div>
-          <router-link
-            :to="'/profile/' + post.author.username"
-            class="text-blue-500 hover:underline"
-            >By {{ post.author.username }}</router-link
-          >
-          <div class="flex justify-between">
-            <div class="flex items-center space-x-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 text-gray-500 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5 2a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v11a2 2 0 01-2 2H3a2 2 0 01-2-2V6c0-1.1.9-2 2-2h2V2zm0 2v1h10V4H5zm0 2v2h10V6H5zm0 3v2h6V9H5zm0 3v2h6v-2H5zm0 3v2h6v-2H5zm8-9v6h2V9h-2z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <span class="text-gray-500">{{ post.likes }} Likes</span>
-            </div>
-            <div class="flex items-center space-x-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 text-gray-500 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a.9.9 0 01-.9-.9V10.9A.9.9 0 0110 10h6.1a.9.9 0 01.9.9v6.2a.9.9 0 01-.9.9H10zM7 10.9a.9.9 0 00-.9.9V17H2V7h5v3.9zM18 0H2a2 2 0 00-2 2v16a2 2 0 002 2h8l4 4 4-4h2a2 2 0 002-2V2a2 2 0 00-2-2zm0 18H10V2h8v16z"
-                />
-              </svg>
-              <span class="text-gray-500">{{ post.comments }} Comments</span>
-              <router-link :to="'/post/' + post.id" class="text-blue-500 hover:underline"
-                >Read more</router-link
-              >
+      <!-- List of all Tags -->
+    </div>
+    <div
+      v-for="post in posts.data"
+      :key="post.id"
+      class="mb-4 max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-lg"
+    >
+      <img
+        class="h-64 w-full object-cover object-center"
+        src="post.thumbnail"
+        alt="Post Thumbnail"
+      />
+
+      <div class="p-6">
+        <div class="font-semibold text-2xl mb-2">{{ post.title }}</div>
+        <router-link :to="'/profile/' + post.author.username" class="text-blue-500 hover:underline">
+          By {{ post.author.username }}
+        </router-link>
+        <div class="flex justify-between mt-4">
+          <div class="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-500 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <!-- Your SVG path here -->
+            </svg>
+            <span class="text-gray-500">{{ post.likes }} Likes</span>
+          </div>
+          <div class="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-500 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <!-- Your SVG path here -->
+            </svg>
+            <span class="text-gray-500">{{ post.comments }} Comments</span>
+            <router-link :to="'/post/' + post.id" class="text-blue-500 hover:underline">
+              Read more
+            </router-link>
+          </div>
+          <!-- Tags List -->
+          <div class="mt-4">
+            <div class="flex flex-wrap">
+              <span class="text-gray-500 mr-2">Tags:</span>
+              <div v-for="tag in post.tags">
+                <span
+                  :key="tag"
+                  class="bg-blue-200 text-blue-700 rounded-full px-2 py-1 text-xs font-semibold mr-2"
+                >
+                  {{ tag }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
+
     <div class="flex justify-center mt-6">
       <TailwindPagination :data="posts" @pagination-change-page="getPosts" />
-    </div>
-    <div class="flex justify-center mt-6">
-      <!-- Use the TailwindPagination component with props -->
-      <TailwindPagination :data="paginationData" @pagination-change-page="getPosts" />
     </div>
   </div>
 </template>
@@ -76,6 +98,8 @@ const props = defineProps({
 
 const posts = ref([])
 const currentPage = ref(1)
+const allTags = ref([])
+const selectedTags = ref([])
 
 const paginationData = computed(() => {
   return {
@@ -85,13 +109,24 @@ const paginationData = computed(() => {
   }
 })
 
-async function getPosts(page = 1) {
+async function ggetPosts(page = 1) {
   currentPage.value = page
   const fetchedPosts = await api.getPosts(page, props.author, props.favorited)
   posts.value = fetchedPosts.data.data
 }
 
+async function getTags() {
+  const fetchedTags = await api.getTags()
+  allTags.value = fetchedTags.data
+  console.log(fetchedTags)
+}
+
+const getPosts = async (page = 1) => {
+  const response = await api.getPosts(page, props.author, props.favorited)
+  posts.value = response.data
+}
+
 onMounted(() => {
-  getPosts()
+  getPosts(), getTags()
 })
 </script>

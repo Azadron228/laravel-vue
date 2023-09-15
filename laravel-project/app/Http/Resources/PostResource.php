@@ -27,7 +27,7 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'body' => $this->body,
-            'thumbnail_url' => asset('storage/' . $this->thumbnail),
+            'thumbnail' => asset('storage/' . $this->thumbnail),
             //'favorite_count' => $this->favoritedBy->count(),
             'tags' => TagsResource::collection($this->tags),
             'author' => new UserResource($this->resource->user),
