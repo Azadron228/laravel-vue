@@ -9,8 +9,8 @@ use App\Http\Resources\PostResource;
 use App\Http\Resources\TagsCollection;
 use App\Http\Resources\TagsResource;
 use App\Models\Post;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
 use Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -29,8 +29,8 @@ class PostController extends Controller
     {
         $query = Post::query();
 
-        if ($request->has('tag')) {
-            $tagName = $request->input('tag');
+        if ($request->has('tags')) {
+            $tagName = $request->input('tags');
 
             $query->whereHas(
                 'tags',
@@ -81,8 +81,12 @@ class PostController extends Controller
 
     public function listTags(Request $request)
     {
-        // return new TagsResource(Tag::all());
-        return new TagsCollection(Tag::all());
+        // return new TagsRes;ource(Tag::all());
+        // return Tag::all();
+        $tags = Tag::all();
+
+        return TagsResource::collection($tags);
+        // return new TagsCollection(Tag::all());
     }
 
     public function createPost(StorePostRequest $request)

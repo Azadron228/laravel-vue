@@ -25,6 +25,7 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => 'sometimes|string|max:255',
             'body' => 'sometimes|string',
+            'description' => 'sometimes|string',
             'thumbnail' => 'sometimes|image|mimes:jpeg,jpg,gif,png|max:20480',
         ];
     }

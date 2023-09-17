@@ -43,7 +43,7 @@ const navList = computed(() => [
 </script>
 
 <template>
-  <nav class="bg-white shadow">
+  <nav class="w-full bg-white shadow">
     <div class="h-1/7 container mx-auto py-4">
       <router-link class="text-xl font-bold text-blue-500" to="/">
         conduit

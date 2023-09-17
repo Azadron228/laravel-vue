@@ -65,9 +65,9 @@ const createPost = async () => {
     const response = await api.createPost(post.value)
     console.log('Post created:', response.data)
     // Reset the form
-    post.title = ''
-    post.body = ''
-    post.thumbnail = null
+    post.value.title = ''
+    post.value.body = ''
+    post.value.thumbnail = null
     // Optionally, you can redirect to the post details page or perform other actions.
   } catch (error) {
     console.error('Error creating post:', error)
