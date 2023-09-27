@@ -14,9 +14,11 @@ Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 Route::get('/listTags', [PostController::class, 'listTags'])->name('tags');
 
 // Guest accessible routes
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
-Route::get('post/{id}', [PostController::class, 'show'])->name('posts.show');
+// Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
+// Route::get('post/{id}', [PostController::class, 'show'])->name('posts.show');
+// Route::get('posts/{slug}', [PostController::class, 'showBySlug']);
 
+Route::apiResource('posts', PostController::class);
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])

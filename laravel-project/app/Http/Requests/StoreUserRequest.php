@@ -26,4 +26,12 @@ class StoreUserRequest extends FormRequest
             ],
         ];
     }
+
+    /**
+     * @return array<mixed>
+     */
+    public function validationData()
+    {
+        return Arr::wrap($this->input('user'));
+    }
 }

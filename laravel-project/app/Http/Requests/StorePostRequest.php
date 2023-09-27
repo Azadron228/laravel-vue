@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Arr;
 use Illuminate\Foundation\Http\FormRequest;
+use Str;
 
 class StorePostRequest extends FormRequest
 {
@@ -30,5 +31,12 @@ class StorePostRequest extends FormRequest
             'tags' => 'sometimes|array',
             'tagList.*' => 'required|string|max:255',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'slug' => Str::slug($this->input('title')),
+        ]);
     }
 }

@@ -6,12 +6,10 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
-use App\Http\Resources\TagsCollection;
 use App\Http\Resources\TagsResource;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Storage;
@@ -25,7 +23,14 @@ class PostController extends Controller
         $this->post = $post;
     }
 
-    public function showAll(Request $request)
+    public function show($slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+
+        return new PostResource($post);
+    }
+
+    public function index(Request $request)
     {
         $query = Post::query();
 
@@ -111,7 +116,7 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    public function show($id)
+    public function ashow($id)
     {
         $post = Post::findOrFail($id);
 
