@@ -23,8 +23,15 @@ class AuthController extends Controller
         // return back()->withErrors([
         //     'email' => 'The provided credentials do not match our records.',
         // ])->onlyInput('email');
+        return response()->json([
+            'message' => trans('validation.invalid'),
+            'errors' => [
+                'user' => [trans('auth.failed')],
+            ],
+        ], 422);
 
-        return response(['message' => 'Invalid Credentials']);
+
+        // return response(['message' => 'Invalid Credentials']);
     }
 
     public function register(StoreUserRequest $request)
