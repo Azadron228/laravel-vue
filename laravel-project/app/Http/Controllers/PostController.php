@@ -108,10 +108,9 @@ class PostController extends Controller
         // }
         $validatedData = $request->validated();
         $validatedData['user_id'] = $user->id;
-        $slug = Str::slug($validatedData['title']);
-        $validatedData['slug'] = $slug;
+        // $slug = Str::slug($validatedData['title']);
+        // $validatedData['slug'] = $slug;
         // $validatedData['thumbnail'] = $thumbnailPath;
-        // dd($validatedData);
         $post = Post::create($validatedData);
         if (is_array($tags)) {
             $post->attachTags($tags);

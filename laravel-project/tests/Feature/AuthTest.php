@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Auth;
 use Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -42,8 +43,10 @@ class AuthTest extends TestCase
         $user = User::where('email', $email)->first();
         $this->assertAuthenticatedAs($user);
     }
-
-    public function user_can_login_with_valid_credentials()
+    /**
+     * @return void
+     */
+    public function userCanLoginWithCredentials(): void
     {
         $password = $this->faker->password(8);
         /** @var User $user */
@@ -91,5 +94,26 @@ class AuthTest extends TestCase
 
         $response->assertUnprocessable()
             ->assertInvalid('user');
+    }
+
+
+    public function testLogOutUser(): void
+    {
+        $password = $this->faker->password(8);
+        /** @var User $user */
+        $user = User::factory()
+            ->state(['password' => Hash::make($password)])
+            ->create();
+
+        $response = $this->postJson('/api/login', [
+            'user' => [
+                'email' => $user->email,
+                'password' => $password,
+            ],
+        ]);
+        Auth::login($user);
+        $response = $this->post('/logout');
+
+        $this->assertGuest();
     }
 }
