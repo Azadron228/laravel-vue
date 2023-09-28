@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Storage;
+use Str;
 
 class PostController extends Controller
 {
@@ -94,20 +95,23 @@ class PostController extends Controller
         // return new TagsCollection(Tag::all());
     }
 
-    public function createPost(StorePostRequest $request)
+    public function store(StorePostRequest $request)
     {
         $user = auth()->user();
         // $tags = Arr::pull($attributes, 'tagList');
         $tags = $request->input('tags');
 
-        $thumbnailPath = null;
-
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = Storage::disk('public')->put('thumbnails', $request->file('thumbnail'));
-        }
+        // $thumbnailPath = null;
+        //
+        // if ($request->hasFile('thumbnail')) {
+        //     $thumbnailPath = Storage::disk('public')->put('thumbnails', $request->file('thumbnail'));
+        // }
         $validatedData = $request->validated();
         $validatedData['user_id'] = $user->id;
-        $validatedData['thumbnail'] = $thumbnailPath;
+        $slug = Str::slug($validatedData['title']);
+        $validatedData['slug'] = $slug;
+        // $validatedData['thumbnail'] = $thumbnailPath;
+        // dd($validatedData);
         $post = Post::create($validatedData);
         if (is_array($tags)) {
             $post->attachTags($tags);

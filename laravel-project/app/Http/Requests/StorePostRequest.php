@@ -33,10 +33,24 @@ class StorePostRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation()
+    // protected function prepareForValidation()
+    // {
+    //     $title = $this->input('title');
+    //     // Add debugging code to check if $title is set correctly
+    //     // dd($title);
+    //     $this->merge([
+    //         'slug' => Str::slug($title),
+    //     ]);
+    //     // $this->merge([
+    //     //     'slug' => Str::slug($this->input('title')),
+    //     // ]);
+    // }
+
+    /**
+     * @return array<mixed>
+     */
+    public function validationData()
     {
-        $this->merge([
-            'slug' => Str::slug($this->input('title')),
-        ]);
+        return Arr::wrap($this->input('post'));
     }
 }

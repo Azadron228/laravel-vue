@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class PostTest extends TestCase
 {
+    use WithFaker;
+
     public function testListArticles(): void
     {
         $response = $this->get('/posts');
@@ -28,5 +32,53 @@ class PostTest extends TestCase
                     'data.1.author.avatar' => 'string',
                 ])
         );
+    }
+
+
+    public function testCreateArticle(): void
+    {
+        /** @var User $author */
+        $author = User::factory()->create();
+
+        $title = 'Originall title';
+        $description = $this->faker->paragraph();
+        $body = $this->faker->text();
+        $tags = ['one', 'two', 'three', 'four', 'five'];
+
+        $response = $this->actingAs($author)
+            ->postJson('/posts', [
+                'post' => [
+                    'title' => $title,
+                    'description' => $description,
+                    'body' => $body,
+                    'tags' => $tags,
+                ],
+            ]);
+        // dd($response);
+        $response->assertCreated()
+            ->assertJson(fn (AssertableJson $json) =>
+                $json->has('post', fn (AssertableJson $item) =>
+                    $item->whereAll([
+                            'title' => $title,
+                            'description' => $description,
+                            'body' => $body,
+                            'favorited' => false,
+                            'favoritesCount' => 0,
+                        ])
+                        ->whereAllType([
+                            'createdAt' => 'string',
+                            'updatedAt' => 'string',
+                            'tags' => 'array',
+                        ])
+                        ->has('author', fn (AssertableJson $subItem) =>
+                            $subItem->whereAll([
+                                'username' => $author->username,
+                                'bio' => $author->bio,
+                                'image' => $author->image,
+                                'following' => false,
+                            ])
+                        )
+                )
+            );
     }
 }
