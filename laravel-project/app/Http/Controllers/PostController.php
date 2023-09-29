@@ -97,7 +97,8 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $user = auth()->user();
+        // $user = auth()->user();
+        $user = $request->user();
         // $tags = Arr::pull($attributes, 'tagList');
         $tags = $request->input('tags');
 
@@ -108,6 +109,7 @@ class PostController extends Controller
         // }
         $validatedData = $request->validated();
         $validatedData['user_id'] = $user->id;
+        // $validatedData['author_id'] = $user->getKey();
         // $slug = Str::slug($validatedData['title']);
         // $validatedData['slug'] = $slug;
         // $validatedData['thumbnail'] = $thumbnailPath;

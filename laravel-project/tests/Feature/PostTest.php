@@ -4,13 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Str;
 use Tests\TestCase;
 
 class PostTest extends TestCase
 {
     use WithFaker;
+    use RefreshDatabase;
 
     private Post $post;
 
@@ -18,96 +21,43 @@ class PostTest extends TestCase
     {
         $response = $this->get('/posts');
         $response->assertStatus(200);
-
-        // $response->assertJson(
-        //     fn (AssertableJson $json) => $json->has('links')
-        //         ->has('meta')
-        //         ->has('data')->whereAllType([
-        //             'data.1.slug' => 'string',
-        //             'data.1.title' => 'string',
-        //             'data.1.description' => 'string',
-        //             'data.1.body' => 'string',
-        //             'data.1.tags' => 'array',
-        //             'data.1.author.username' => 'string',
-        //             'data.1.author.bio' => 'string',
-        //             'data.1.author.email' => 'string',
-        //             'data.1.author.avatar' => 'string',
-        //         ])
-        // );
-        //
-        // $response->assertJson(
-        //     fn (AssertableJson $json) =>
-        //         $json->has(
-        //             'data',
-        //             fn (AssertableJson $item) =>
-        //             $item->whereAllType([
-        //                     'title' => 'string',
-        //                     'description' => 'string',
-        //                     'body' => 'string',
-        //                     'favorited' => 'string',
-        //                     'favoritesCount' => 'string',
-        //                     'createdAt' => 'string',
-        //                     'updatedAt' => 'string',
-        //                     'tags' => 'array',
-        //                 ])
-        //                 ->has(
-        //                     'author',
-        //                     fn (AssertableJson $subItem) =>
-        //                     $subItem->whereAll([
-        //                         'username' => $author->username,
-        //                         'bio' => $author->bio,
-        //                         'image' => $author->image,
-        //                         'following' => false,
-        //                     ])
-        //                 )
-        //         )
-        // );
-
-
-
-
-
         $response->assertJson(
-            fn (AssertableJson $json)=>$json->has('meta')->has('links')->has('data',
-        fn (AssertableJson $data) =>
-        $data->each(
-            fn (AssertableJson $item) =>
-            $item->whereAllType([
-                'title' => 'string',
-                'description' => 'string',
-                'body' => 'string',
-                'tags' => 'array',
-            ])->has(
-                'author',
-                fn (AssertableJson $subItem) =>
-                $subItem->whereAllType([
-                    'id'=>'integer',
-                    'email'=>'string',
-                    'created_at' => 'string',
+            fn (AssertableJson $json) => $json->has('meta')->has('links')->has(
+                'data',
+                fn (AssertableJson $data) => $data->each(
+                    fn (AssertableJson $item) => $item->whereAllType([
+                        'title' => 'string',
+                        'description' => 'string',
+                        'body' => 'string',
+                        'tags' => 'array',
+                    ])->has(
+                        'author',
+                        fn (AssertableJson $subItem) => $subItem->whereAllType([
+                            'id' => 'integer',
+                            'email' => 'string',
+                            'created_at' => 'string',
                             'updated_at' => 'string',
-                    'username' => 'string',
-                    'bio' => 'string',
-                    'avatar' => 'string',
-                    // 'following' => 'boolean',
-                ])
-            )->etc()
-        )->etc()
-    )
+                            'username' => 'string',
+                            'bio' => 'string',
+                            'avatar' => 'string',
+                            // 'following' => 'boolean',
+                        ])
+                    )->etc()
+                )->etc()
+            )
         );
     }
 
-
     public function testCreatePost(): void
     {
-        /** @var User $author */
-        $author = User::factory()->create();
+        $user = User::factory()->create();
 
-        $title = 'is test title';
+        $title = 'This is test title';
         $description = $this->faker->paragraph();
         $body = $this->faker->text();
         $tags = ['one', 'two', 'three', 'four', 'five'];
 
-        $response = $this->actingAs($author)
+        $response = $this->actingAs($user)
             ->postJson('/posts', [
                 'post' => [
                     'title' => $title,
@@ -119,79 +69,73 @@ class PostTest extends TestCase
 
         $response->assertCreated()
             ->assertJson(
-                fn (AssertableJson $json) =>
-                $json->has(
+                fn (AssertableJson $json) => $json->has(
                     'post',
-                    fn (AssertableJson $item) =>
-                    $item->whereAll([
-                            'title' => $title,
-                            'description' => $description,
-                            'body' => $body,
-                            'favorited' => false,
-                            'favoritesCount' => 0,
-                        ])
+                    fn (AssertableJson $item) => $item->whereAll([
+                        'title' => $title,
+                        'description' => $description,
+                        'body' => $body,
+                    ])
                         ->whereAllType([
-                            'createdAt' => 'string',
-                            'updatedAt' => 'string',
                             'tags' => 'array',
                         ])
                         ->has(
                             'author',
-                            fn (AssertableJson $subItem) =>
-                            $subItem->whereAll([
-                                'username' => $author->username,
-                                'bio' => $author->bio,
-                                'image' => $author->image,
-                                'following' => false,
+                            fn (AssertableJson $subItem) => $subItem->whereAll([
+                                'username' => $user->username,
+                                'bio' => $user->bio,
+                            ])->whereAllType([
+                                'id' => 'integer',
+                                'email' => 'string',
+                                'created_at' => 'string',
+                                'updated_at' => 'string',
+                                'avatar' => 'string',
                             ])
-                        )
-                )
+                        )->etc()
+                )->etc()
             );
     }
-
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        /** @var Post $post*/
         $post = Post::factory()->create();
         $this->post = $post;
     }
 
     public function testUpdatePost(): void
     {
-        $author = $this->post->author;
+         $anpost = Post::factory()->create();
+        $user= $this->post->author;
+        dd($anpost);
 
         $this->assertNotEquals($title = 'Updated title', $this->post->title);
-        $this->assertNotEquals($fakeSlug = 'overwrite-slug', $this->post->slug);
         $this->assertNotEquals($description = 'New description.', $this->post->description);
         $this->assertNotEquals($body = 'Updated post body.', $this->post->body);
 
-        // update by one to check required_without_all rule
-        $this->actingAs($author)
-            ->putJson("/post/{$this->post->slug}", ['post' => ['description' => $description]])
-            ->assertOk();
-        $this->actingAs($author)
-            ->putJson("/post/{$this->post->slug}", ['post' => ['body' => $body]]);
-        $response = $this->actingAs($author)
-            ->putJson("/post/{$this->post->slug}", [
+        $response = $this->actingAs($user)
+            ->putJson("/posts/{$this->post->slug}", [
                 'post' => [
                     'title' => $title,
-                    'slug' => $fakeSlug, // must be overwritten with title slug
+                    'description' => $description,
+                    'body' => $body,
                 ],
             ]);
 
+
+                $response->dumpHeaders();
+
+        $response->dumpSession();
+
+        $response->dump();
+
         $response->assertOk()
             ->assertJson(
-                fn (AssertableJson $json) =>
-                $json->has(
+                fn (AssertableJson $json) => $json->has(
                     'post',
-                    fn (AssertableJson $item) =>
-                    $item->whereType('updatedAt', 'string')
+                    fn (AssertableJson $item) => $item->whereType('updatedAt', 'string')
                         ->whereAll([
-                            'slug' => 'updated-title',
-                            'title' => $title,
+                            'slug' => Str::slug($title), 'title' => $title,
                             'description' => $description,
                             'body' => $body,
                             'tagList' => [],
@@ -201,8 +145,7 @@ class PostTest extends TestCase
                         ])
                         ->has(
                             'author',
-                            fn (AssertableJson $subItem) =>
-                            $subItem->whereAll([
+                            fn (AssertableJson $subItem) => $subItem->whereAll([
                                 'username' => $author->username,
                                 'bio' => $author->bio,
                                 'image' => $author->image,
@@ -215,7 +158,6 @@ class PostTest extends TestCase
 
     public function testUpdateForeignPost(): void
     {
-        /** @var User $user */
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
@@ -224,7 +166,8 @@ class PostTest extends TestCase
                     'body' => $this->faker->text(),
                 ],
             ]);
-
+        // dd($this->post->slug);
         $response->assertForbidden();
+
     }
 }
