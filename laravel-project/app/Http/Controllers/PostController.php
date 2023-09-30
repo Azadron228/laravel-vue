@@ -128,11 +128,19 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    public function destroy($id)
+    public function destroy($slug)
     {
-        $this->post->deletePost($id);
+    $post = Post::where('slug', $slug)->first();
 
-        return response()->json(null, 204);
+    if (!$post) {
+        return response()->json(['error' => 'Post not found'], 404);
+    }
+
+    $this->authorize('delete', $post);
+
+    $post->delete();
+
+    return response()->json(null, 200);
     }
 
     /**
@@ -140,15 +148,21 @@ class PostController extends Controller
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function update(UpdatePostRequest $request, Post $post, $id)
+    public function update(UpdatePostRequest $request, Post $post, $slug)
     {
-        $this->authorize('update', $post);
-        $post = Post::findOrFail($id);
+        // $this->authorize('update', $post);
+        // $post = Post::findOrFail($id);
+        $post = Post::where('slug', $slug)->first();
+                $this->authorize('update', $post);
+
         $validatedData = $request->validated();
+
 
         $post->update($validatedData);
 
-        return response()->json($post);
+        // return response()->json($post);
+        return new PostResource($post);
+
     }
 
     /** Fovorites Logic **/

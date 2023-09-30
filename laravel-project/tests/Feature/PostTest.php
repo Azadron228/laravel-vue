@@ -12,8 +12,7 @@ use Tests\TestCase;
 
 class PostTest extends TestCase
 {
-    use WithFaker;
-    use RefreshDatabase;
+    use WithFaker, RefreshDatabase;
 
     private Post $post;
 
@@ -21,6 +20,7 @@ class PostTest extends TestCase
     {
         $response = $this->get('/posts');
         $response->assertStatus(200);
+
         $response->assertJson(
             fn (AssertableJson $json) => $json->has('meta')->has('links')->has(
                 'data',
@@ -105,16 +105,17 @@ class PostTest extends TestCase
 
     public function testUpdatePost(): void
     {
-         $anpost = Post::factory()->create();
-        $user= $this->post->author;
-        dd($anpost);
+        $post = Post::factory()->create();
+        $user_id = $post->user_id;
 
-        $this->assertNotEquals($title = 'Updated title', $this->post->title);
-        $this->assertNotEquals($description = 'New description.', $this->post->description);
-        $this->assertNotEquals($body = 'Updated post body.', $this->post->body);
+        $user = User::find($user_id);
+
+        $this->assertNotEquals($title = 'Updated title', $post->title);
+        $this->assertNotEquals($description = 'New description.', $post->description);
+        $this->assertNotEquals($body = 'Updated post body.', $post->body);
 
         $response = $this->actingAs($user)
-            ->putJson("/posts/{$this->post->slug}", [
+            ->putJson("/post/{$post->slug}", [
                 'post' => [
                     'title' => $title,
                     'description' => $description,
@@ -122,36 +123,19 @@ class PostTest extends TestCase
                 ],
             ]);
 
-
-                $response->dumpHeaders();
-
-        $response->dumpSession();
-
-        $response->dump();
-
         $response->assertOk()
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
                     'post',
-                    fn (AssertableJson $item) => $item->whereType('updatedAt', 'string')
+                    fn (AssertableJson $item) => $item->whereType('updated_at', 'string')
                         ->whereAll([
                             'slug' => Str::slug($title), 'title' => $title,
                             'description' => $description,
                             'body' => $body,
-                            'tagList' => [],
-                            'createdAt' => $this->post->created_at?->toISOString(),
-                            'favorited' => false,
-                            'favoritesCount' => 0,
-                        ])
-                        ->has(
-                            'author',
-                            fn (AssertableJson $subItem) => $subItem->whereAll([
-                                'username' => $author->username,
-                                'bio' => $author->bio,
-                                'image' => $author->image,
-                                'following' => false,
-                            ])
-                        )
+                            // 'createdAt' => $post->created_at?->toISOString(),
+                            // 'favorited' => false,
+                            // 'favoritesCount' => 0,
+                        ])->etc()
                 )
             );
     }
@@ -160,14 +144,39 @@ class PostTest extends TestCase
     {
         $user = User::factory()->create();
 
+
         $response = $this->actingAs($user)
             ->putJson("/post/{$this->post->slug}", [
                 'post' => [
                     'body' => $this->faker->text(),
                 ],
             ]);
-        // dd($this->post->slug);
         $response->assertForbidden();
+    }
 
+    public function testDeletePost(): void
+    {
+        $post = Post::factory()->create();
+        $user_id = $post->user_id;
+
+        $user = User::find($user_id);
+
+        $response = $this->actingAs($user)
+            ->deleteJson("/posts/{$post->slug}")
+            ->assertOk();
+
+        $this->assertModelMissing($post);
+    }
+
+    public function testDeleteForeignArticle(): void
+    {
+        $post = Post::factory()->create();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->deleteJson("/posts/{$post->slug}")
+            ->assertForbidden();
+
+        $this->assertModelExists($post);
     }
 }

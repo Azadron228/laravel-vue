@@ -31,10 +31,13 @@ class PostResource extends JsonResource
             'thumbnail' => asset('storage/'.$this->thumbnail),
             'description' => $this->description,
             'favorite_count' => $this->favorited->count(),
+                        'updated_at' => $this->updated_at,
+
 
             //'favorite_count' => $this->favoritedBy->count(),
             'tags' => TagsResource::collection($this->tags),
             'author' => new UserResource($this->resource->user),
+
         ];
     }
 }

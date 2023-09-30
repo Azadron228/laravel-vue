@@ -11,14 +11,6 @@ use Str;
 class StorePostRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
      * Prepare the data for validation.
      *
      * @return void
@@ -27,7 +19,6 @@ class StorePostRequest extends FormRequest
     {
         $input = $this->input();
         $title = Arr::get($input, 'post.title');
-        // dd($input);
 
         if (is_string($title)) {
             Arr::set($input, 'post.slug', Str::slug($title));
@@ -61,30 +52,7 @@ class StorePostRequest extends FormRequest
             'tags' => 'sometimes|array',
             'tagList.*' => 'required|string|max:255',
         ];
-        //
-        // dd($this->input());
-        // return [
-        //     'title' => 'required|string|max:255',
-        //     'body' => 'required|string',
-        //     'description' => 'required|string',
-        //     'thumbnail' => 'sometimes|image|mimes:jpeg,jpg,gif,png|max:20480',
-        //     'tags' => 'sometimes|array',
-        //     'tagList.*' => 'required|string|max:255',
-        // ];
     }
-
-    // protected function prepareForValidation()
-    // {
-    //     $title = $this->input('title');
-    //     // Add debugging code to check if $title is set correctly
-    //     // dd($title);
-    //     $this->merge([
-    //         'slug' => Str::slug($title),
-    //     ]);
-    //     // $this->merge([
-    //     //     'slug' => Str::slug($this->input('title')),
-    //     // ]);
-    // }
 
     /**
      * @return array<mixed>

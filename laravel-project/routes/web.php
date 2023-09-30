@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/post/create', [PostController::class, 'createPost'])->name('post.create');
     Route::put('/post/{id}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('post/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+    // Route::delete('post/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::get('/posts/feed', [PostController::class, 'getFeed'])->name('post.feed');
     Route::post('/posts/{post}/favorite', [PostController::class, 'favoritePost'])->name('posts.favorite');
     Route::delete('/posts/{post}/unfavorite', [PostController::class, 'unfavoritePost'])->name('posts.unfavorite');
