@@ -164,12 +164,15 @@ class PostController extends Controller
     }
 
     /** Fovorites Logic **/
-    public function favoritePost(Request $request, Post $post)
+    public function favoritePost(Request $request, $slug)
     {
-        $user = auth()->user();
-        $user->favorites()->attach($post->id);
+        $post = Post::where('slug', $slug)->firstOrFail();
 
-        return response()->json(['message' => 'Post added to favorites.']);
+        $user = auth()->user();
+        $user->favorites()->syncWithoutDetaching($post->id);
+
+        // return response()->json(['message' => 'Post added to favorites.']);
+        return new PostResource($post);
     }
 
     public function unfavoritePost(Request $request, Post $post)

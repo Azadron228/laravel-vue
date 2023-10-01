@@ -10,6 +10,7 @@ use Tests\TestCase;
 class DeleteCommentTest extends TestCase
 {
     private Comment $comment;
+
     private Post $post;
 
     protected function setUp(): void
@@ -35,7 +36,7 @@ class DeleteCommentTest extends TestCase
     public function testDeleteCommentOfNonExistentArticle(): void
     {
         $this->actingAs($this->comment->user)
-            ->deleteJson("/comments/{999999999999}")
+            ->deleteJson('/comments/{999999999999}')
             ->assertNotFound();
 
         $this->assertModelExists($this->comment);

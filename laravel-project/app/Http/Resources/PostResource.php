@@ -21,7 +21,7 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // $user = $request->user();
+        $user = $request->user();
 
         return [
             'id' => $this->id,
@@ -30,11 +30,12 @@ class PostResource extends JsonResource
             'body' => $this->body,
             'thumbnail' => asset('storage/'.$this->thumbnail),
             'description' => $this->description,
-            'favorite_count' => $this->favorited->count(),
-                        'updated_at' => $this->updated_at,
-
-
-            //'favorite_count' => $this->favoritedBy->count(),
+            'favoritesCount' => $this->favorited->count(),
+            'updated_at' => $this->updated_at,
+            'favorited' => $this->when($user !== null, fn() =>
+                // $this->resource->favoredBy($user)
+                $this->favorited->contains($user)
+            ),
             'tags' => TagsResource::collection($this->tags),
             'author' => new UserResource($this->resource->user),
 
