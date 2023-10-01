@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Comment
  *
  * @property int $id
- * @property string $content
+ * @property string $body
  * @property int $user_id
  * @property int $post_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Comment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Comment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Comment query()
- * @method static \Illuminate\Database\Eloquent\Builder|Comment whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment whereBody($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment wherePostId($value)
@@ -33,7 +33,8 @@ class Comment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'content',
+        'id',
+        'body',
         'post_id',
         'user_id',
     ];

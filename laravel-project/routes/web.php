@@ -8,10 +8,13 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 Route::get('/listTags', [PostController::class, 'listTags'])->name('tags');
+    Route::get('posts/{post_id}/comments', [CommentController::class, 'getAll']);
+
 
 // Guest accessible routes
 // Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
@@ -38,8 +41,11 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('profiles/{username}', [ProfileController::class, 'show'])->name('get');
+                    Route::post('article/{slug}/comments', [CommentController::class, 'create'])->name('create');
+
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
+
 
     Route::get('api/user', [UserController::class, 'show'])->name('current');
     Route::put('api/user', [UserController::class, 'update'])->name('update');
@@ -57,8 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/{user}/unfollow', [UserController::class, 'unfollow'])->name('users.unfollow');
 
     Route::post('comments', [CommentController::class, 'create']);
+    Route::post('jojo/{slug}/comments', [CommentController::class, 'create'])->name('create');
     Route::delete('comments/{comment}', [CommentController::class, 'delete']);
-    Route::get('posts/{post_id}/comments', [CommentController::class, 'getAll']);
 
     Route::post('/post/create', [PostController::class, 'createPost'])->name('post.create');
     Route::put('/post/{id}', [PostController::class, 'update'])->name('posts.update');
