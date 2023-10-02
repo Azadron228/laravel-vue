@@ -8,7 +8,7 @@
     >
       <router-link
         to=""
-        class="page-link block py-2 px-3 rounded-full hover:bg-blue-300"
+        class="page-link block py-2 px-3 hover:bg-blue-300"
         @click="$emit('currentChange', item)"
       >
         {{ item }}

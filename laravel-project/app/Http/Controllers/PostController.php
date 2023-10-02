@@ -150,16 +150,11 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post, $slug)
     {
-        // $this->authorize('update', $post);
-        // $post = Post::findOrFail($id);
         $post = Post::where('slug', $slug)->first();
         $this->authorize('update', $post);
-
         $validatedData = $request->validated();
-
         $post->update($validatedData);
 
-        // return response()->json($post);
         return new PostResource($post);
     }
 
@@ -167,19 +162,18 @@ class PostController extends Controller
     public function favoritePost(Request $request, $slug)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
-
         $user = auth()->user();
         $user->favorites()->syncWithoutDetaching($post->id);
 
-        // return response()->json(['message' => 'Post added to favorites.']);
         return new PostResource($post);
     }
 
-    public function unfavoritePost(Request $request, Post $post)
+    public function unfavoritePost(Request $request, $slug)
     {
+        $post = Post::where('slug', $slug)->firstOrFail();
         $user = auth()->user();
         $user->favorites()->detach($post->id);
 
-        return response()->json(['message' => 'Post removed from favorites.']);
+        return new PostResource($post);
     }
 }

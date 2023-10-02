@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
-class CommentTest extends TestCase
+class CreateCommentTest extends TestCase
 {
    use WithFaker;
 

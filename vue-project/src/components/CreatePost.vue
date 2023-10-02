@@ -21,6 +21,15 @@
         ></textarea>
       </div>
       <div class="mb-4">
+        <label for="description" class="block font-semibold">Description</label>
+        <textarea
+          v-model="post.description"
+          id="description"
+          class="w-full px-3 py-2 border rounded"
+          rows="4"
+        ></textarea>
+      </div>
+      <div class="mb-4">
         <label for="tags" class="block font-semibold">Tags</label>
         <input
           v-model="post.tags"
@@ -50,6 +59,7 @@ const post = ref({
   title: '',
   body: '',
   thumbnail: null, 
+  description: '',
   tags: []
 })
 

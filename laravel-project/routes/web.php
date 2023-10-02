@@ -8,13 +8,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 Route::get('/listTags', [PostController::class, 'listTags'])->name('tags');
-    Route::get('posts/{post_id}/comments', [CommentController::class, 'getAll']);
-
+Route::get('posts/{post_id}/comments', [CommentController::class, 'getAll']);
 
 // Guest accessible routes
 // Route::get('/posts', [PostController::class, 'showAll'])->name('posts.index');
@@ -22,6 +20,10 @@ Route::get('/listTags', [PostController::class, 'listTags'])->name('tags');
 // Route::get('posts/{slug}', [PostController::class, 'showBySlug']);
 
 Route::apiResource('posts', PostController::class);
+
+Route::get('/', function (Request $request) {
+     return "hello world";
+});
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
@@ -41,14 +43,15 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('profiles/{username}', [ProfileController::class, 'show'])->name('get');
-                    Route::post('article/{slug}/comments', [CommentController::class, 'create'])->name('create');
+Route::post('article/{slug}/comments', [CommentController::class, 'create'])->name('create');
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
 
-
     Route::get('api/user', [UserController::class, 'show'])->name('current');
     Route::put('api/user', [UserController::class, 'update'])->name('update');
+    Route::post('api/user', [UserController::class, 'updateAvatar'])->name('update.avatar');
+
 
     Route::post('profiles/{username}/follow', [ProfileController::class, 'follow'])
         ->name('follow');
@@ -66,10 +69,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('jojo/{slug}/comments', [CommentController::class, 'create'])->name('create');
     Route::delete('comments/{comment}', [CommentController::class, 'delete']);
 
+
     Route::post('/post/create', [PostController::class, 'createPost'])->name('post.create');
     Route::put('/post/{id}', [PostController::class, 'update'])->name('posts.update');
     // Route::delete('post/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::get('/posts/feed', [PostController::class, 'getFeed'])->name('post.feed');
     Route::post('/posts/{post}/favorite', [PostController::class, 'favoritePost'])->name('posts.favorite');
-    Route::delete('/posts/{post}/unfavorite', [PostController::class, 'unfavoritePost'])->name('posts.unfavorite');
+    Route::delete('/posts/{post}/favorite', [PostController::class, 'unfavoritePost'])->name('posts.unfavorite');
 });

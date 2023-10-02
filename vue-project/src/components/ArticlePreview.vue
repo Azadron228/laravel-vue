@@ -31,7 +31,7 @@
       </button>
     </div>
     <router-link
-      :to="'/profile/'"
+        :to="'/post/' + slug"
       class="text-xl font-semibold text-gray-900 mt-2"
     >
       {{ title }}
@@ -62,6 +62,7 @@ const props = defineProps({
   author: String,
   likes: Number,
   comments: Number,
-  tags: Array
+  tags: Array,
+  slug: String,
 })
 </script>

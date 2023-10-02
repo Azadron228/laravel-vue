@@ -2,14 +2,11 @@
 
 namespace App\Http\Requests;
 
+use Arr;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -21,8 +18,14 @@ class UpdateUserRequest extends FormRequest
             'username' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255',
             'bio' => 'sometimes|string',
-            'avatar' => 'sometimes|image|max:20480',
-
         ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function validationData()
+    {
+        return Arr::wrap($this->input('user'));
     }
 }
