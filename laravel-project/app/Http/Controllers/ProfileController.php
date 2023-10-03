@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ProfileController extends Controller
 {
@@ -16,17 +18,31 @@ class ProfileController extends Controller
         return new UserResource($profile);
     }
 
-    public function follow(User $user)
+    public function follow(Request $request, string $username)
     {
-        $authenticatedUser = auth()->user();
+        $profile = User::whereUsername($username)
+            ->firstOrFail();
 
-        if (! $authenticatedUser->followers()->where('follower_id', $user->id)->exists()) {
-            $authenticatedUser->followers()->syncWithoutDetaching($user->id);
+        $user = $request->user();
+        $user->followers()
+            ->syncWithoutDetaching($profile);
 
-            return response()->json(['message' => 'You are now following '.$user->name]);
-        }
+        return new UserResource($profile);
+    }
 
-        return response()->json(['message' => 'You are already following '.$user->name]);
+    public function aaafollow(Request $request, $username)
+    {
+        $user = $request->user();
+        $profile = User::whereUsername($username)
+            ->firstOrFail();
+
+        $user->followers()
+            ->syncWithoutDetaching($profile);
+
+        return new UserResource($user);
+                // return new ProfileResource($profile);
+
+
     }
 
     public function unfollow(User $user)
@@ -35,7 +51,10 @@ class ProfileController extends Controller
 
         $User->followers()->detach($user);
 
-        return response()->json(['message' => 'You have unfollowed '.$user->name]);
+                return new UserResource($profile);
+
+
+        // return response()->json(['message' => 'You have unfollowed '.$user->name]);
     }
 
     public function afollow(Request $request, string $username)

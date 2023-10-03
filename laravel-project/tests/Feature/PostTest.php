@@ -40,8 +40,8 @@ class PostTest extends TestCase
                             'username' => 'string',
                             'bio' => 'string',
                             'avatar' => 'string',
-                            // 'following' => 'boolean',
-                        ])
+                            'isFollowing' => 'boolean',
+                        ])->etc()
                     )->etc()
                 )->etc()
             )
@@ -90,7 +90,7 @@ class PostTest extends TestCase
                                 'created_at' => 'string',
                                 'updated_at' => 'string',
                                 'avatar' => 'string',
-                            ])
+                            ])->etc()
                         )->etc()
                 )->etc()
             );
