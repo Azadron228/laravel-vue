@@ -7,12 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Storage;
-use Symfony\Component\HttpFoundation\File\UploadedFile as FileUploadedFile;
 use Tests\TestCase;
 
 class UpdateUserTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
     private User $user;
 
     protected function setUp(): void
@@ -26,16 +25,10 @@ class UpdateUserTest extends TestCase
 
     public function testUpdateUser(): void
     {
-        // Storage::fake('avatars');
-
-        // $avatar = UploadedFile::fake()->image('avatar.jpg');
-
         $username = 'new.username';
         $email = 'newEmail@example.com';
         $bio = 'New bio information.';
-        // $this->assertNotEquals($avatar = 'https://example.com/avatar.png', $this->user->avatar);
 
-        // update by one to check required_without_all rule
         $this->actingAs($this->user)
             ->putJson('/api/user', ['user' => ['username' => $username]])
             ->assertOk();
@@ -44,13 +37,6 @@ class UpdateUserTest extends TestCase
             ->assertOk();
         $response = $this->actingAs($this->user)
             ->putJson('/api/user', ['user' => ['bio' => $bio]]);
-        // $this->actingAs($this->user)
-            // ->post('/api/user', ['user' => ['avatar' => $avatar]]);
-        // $response = $this->actingAs($this->user)->post('/api/user', ['user'=>'_method: PUT']);
-        // $response = $this->json('PUT', '/api/user', [$avatar]);
-        // Storage::disk('avatars')->assertExists($avatar->hashName());
-
-        // $response->dump();
 
         $response->assertOk()
             ->assertJson(
@@ -72,21 +58,22 @@ class UpdateUserTest extends TestCase
         Storage::fake('avatars');
 
         $avatar = UploadedFile::fake()->image('avatar.jpg');
-        // $this->assertNotEquals($avatar = 'https://example.com/avatar.png', $this->user->avatar);
 
         $response = $this->actingAs($this->user)
             ->post('/api/user', ['avatar' => $avatar]);
-        // $response = $this->actingAs($this->user)->post('/api/user', ['user'=>'_method: PUT']);
-        // $response = $this->json('PUT', '/api/user', [$avatar]);
-        // Storage::disk('avatars')->assertExists($avatar->hashName());
-        // $response = $this->post('/avatar', [
-        //     'avatar' => $avatar,
-        // ]);
 
-        $response->dump();
-        // $path = 'avatars' . $avatar->hashName();
-// Storage::disk('avatars')->assertExists($path);
+                $response->assertOk()
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'user',
+                    fn (AssertableJson $item) => $item
+                        ->whereAll([
+                            'avatar'=> '/storage/avatars/' . $avatar->hashName(),
+                        ])->etc()
+                )
+            );
 
-        Storage::disk('avatars')->assertExists($avatar->hashName());
+
+        Storage::disk('public')->assertExists('avatars/' . $avatar->hashName());
     }
  }
